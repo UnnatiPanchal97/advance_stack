@@ -46,7 +46,8 @@
             <div class="s-post-summary--stats">
                 <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized">
                     <span class="s-post-summary--stats-item-number">
-                        @if(isset($question->questonvotes)){{ count($question->questionvotes) }} @else 0 @endif
+                        {{-- {{ dd($question->count) }} --}}
+                        {{ $question->count }}
                     </span>
                     <span class="s-post-summary--stats-item-unit">
                         votes

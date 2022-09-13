@@ -24,63 +24,69 @@
             <div class="row my48">
                 <div class="span text-center">
                     <div id="templates" class="mb-2">
-                        <button id="upvote" class="btn btn-xs btn-outline-success upvote-btn">Upvote</button>
+                        <button id="upvote" class="btn btn-xs btn-outline-success upvote-btn" value="upvote">Upvote</button>
                     </div>
+                    {{ dd(($qv[0]->question_id)) }}
                     <span class="count" title="Total number of votes">
-                        @if (isset($question->questionvotes))
-                            {{ count($question->questionvotes) }}
+                        @if ($questionvotes)
+                            {{ count($questionvotes) }}
                         @else
                             0
                         @endif
                     </span>
                     <div class="mt-2">
-                        <button id="downvote" class="btn btn-xs btn-outline-danger downvote-btn">Downvote</button>
+                        <button id="downvote" class="btn btn-xs btn-outline-danger downvote-btn" value="downvote">Downvote</button>
                     </div>
                     <script>
                         $(document).ready(function() {
-                            $('#upvote').on('click', function() {
+                            $('#upvote').on('click', function(e) {
                                 // $(this).toggleClass('b');
                                 $(this).addClass('upvote-btn on');
+                                $(this).toggleClass('upvote');
                                 // alert('upvote');
-                                $.ajaxSetup({
-                                    headers: {
-                                        'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
-                                    }
-                                });
-                                e.preventDefault();
-                                var formData = {
-                                    title: jQuery('#title').val(),
-                                    description: jQuery('#description').val(),
+                                var params = [];
+                                params['vote_for'] = 'question';
+                                params['url'] =
+                                    @if (count($questionvotes))
+                                        '{{ route('question.votes', $questionvotes[0]->id) }}'
+                                    @else
+                                        '{{ route('question.votes') }}'
+                                    @endif ;
+                                params['headers'] = {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 };
-                                var state = jQuery('#btn-save').val();
-                                var type = "POST";
-                                var todo_id = jQuery('#todo_id').val();
-                                var ajaxurl = 'todo';
-                                $.ajax({
-                                    type: type,
-                                    url: ajaxurl,
-                                    data: formData,
-                                    dataType: 'json',
-                                    success: function(data) {
-                                        var todo = '<tr id="todo' + data.id + '"><td>' + data.id + '</td><td>' +
-                                            data.title + '</td><td>' + data.description + '</td>';
-                                        if (state == "add") {
-                                            jQuery('#todo-list').append(todo);
-                                        } else {
-                                            jQuery("#todo" + todo_id).replaceWith(todo);
-                                        }
-                                        jQuery('#myForm').trigger("reset");
-                                        jQuery('#formModal').modal('hide')
-                                    },
-                                    error: function(data) {
-                                        console.log(data);
-                                    }
-                                });
-                            });
+                                params['type'] = 'GET';
+                                params['count'] = {{ $question->count }};
+                                params['values'] = {
+                                    'question_id': '{{ $question->id }}',
+                                    'user_id': '{{ auth()->user()->id }}'
+                                };
+                                console.log(params);
+                                    $.ajax({
+                                        url: params.url,
+                                        headers: params.headers,
+                                        type: params.type,
+                                        data: {
+                                            'question_id' : params.values.question_id,
+                                            'user_id' :params.values.user_id,
+                                            'count' : params.count,
+                                        },
+                                        success: function(data, status, xhr) {
+                                            //$("#examples").load(location.href + " #examples > *");
+                                            //$("#templates").load(location.href + " #templates > *");
+                                            // location.reload();
+                                            // console.log(data);
+                                        },
+                                    });
+                                // params['callback'] = callback;
+                                // console.log(params['callback']);
+                            // };
+                            // });
                             $('#downvote').on('click', function() {
                                 alert('downvote');
                             });
                         });
+                    });
                     </script>
                     {{-- <div class="examples" id="questionvotes"></div> --}}
                     {{-- <div class="content-center">

@@ -82,7 +82,7 @@ class QuestionController extends Controller
         $qv=QuestionVote::with('questions')->get();
         $answervotes = new AnswerVote();
         // dd($answervotes->replyvotes);
-        return view('question-detail', compact('question', 'ans', 'questionvotes', 'answervotes'));
+        return view('question-detail', compact('question','qv', 'ans', 'questionvotes', 'answervotes'));
         //return view('question-detail');
     }
     /**
@@ -141,36 +141,36 @@ class QuestionController extends Controller
             'answer_id' => 'required',
             'user_id' => 'required',
             'action' => 'required',
-            'newState.count' => 'required',
+            'count' => 'required',
         ]);
         $input['answer_id'] = $request['answer_id'];
         $input['user_id'] = $request['user_id'];
         $input['vote_type'] = $request['action'];
-        $input['count'] = $request['newState.count'];
+        $input['count'] = $request['count'];
         //dd($input);
         $answervotedetails = AnswerVote::updateOrCreate(['id' => $voteid], $input);
         $answerdetails = Answer::find($input['answer_id']);
         $answerdetails['count'] = $input['count'];
         $answerdetails->save();
-        return redirect()->route('questions.show', $request['question_id']);
+        return redirect()->route('question.show', $request['question_id']);
     }
     public function questionCastVote(Request $request, $voteid = null)
     {
         $request->validate([
             'question_id' => 'required',
             'user_id' => 'required',
-            'action' => 'required',
-            'newState.count' => 'required',
+            // 'action' => 'required',
+            'count' => 'required',
         ]);
         $input['question_id'] = $request['question_id'];
         $input['user_id'] = $request['user_id'];
         $input['vote_type'] = $request['action'];
-        $input['count'] = $request['newState.count'];
+        $input['count'] = $request['count'];
         //dd($input);
         $questionvotedetails = QuestionVote::updateOrCreate(['id' => $voteid], $input);
         $questiondetails = Question::find($input['question_id']);
         $questiondetails['count'] = $input['count'];
         $questiondetails->save();
-        return redirect()->route('questions.show', $request['question_id']);
+        return redirect()->route('question.show', $request['question_id']);
     }
 }
