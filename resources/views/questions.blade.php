@@ -46,7 +46,6 @@
             <div class="s-post-summary--stats">
                 <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized">
                     <span class="s-post-summary--stats-item-number">
-                        {{-- {{ dd($question->count) }} --}}
                         {{ $question->count }}
                     </span>
                     <span class="s-post-summary--stats-item-unit">

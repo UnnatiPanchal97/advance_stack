@@ -22,7 +22,7 @@ Auth::routes();
 // Route::resource('/tag',TagController::class);
 Route::group(['middleware' => 'auth'], function () {
     Route::resource('/question', QuestionController::class);
-    Route::get('/question/votes/{id?}', [QuestionController::class, 'questionCastVote'])->name('question.votes');
+    Route::get('/questions/votes/{id?}', [App\Http\Controllers\QuestionController::class,'questionCastVote'])->name('question.votes');
     Route::get('/answers/votes/{id?}', [QuestionController::class, 'answerCastVote'])->name('answers.votes');
     Route::post('vote-up/{uptype}/{qid}', [QuestionController::class, 'question-up']);
     Route::post('vote-down/{uptype}/{qid}', [QuestionController::class, 'question-down']);

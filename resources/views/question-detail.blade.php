@@ -23,71 +23,135 @@
             {{-- my48 --}}
             <div class="row my48">
                 <div class="span text-center">
-                    <div id="templates" class="mb-2">
-                        <button id="upvote" class="btn btn-xs btn-outline-success upvote-btn" value="upvote">Upvote</button>
-                    </div>
-                    {{ dd(($qv[0]->question_id)) }}
-                    <span class="count" title="Total number of votes">
-                        @if ($questionvotes)
-                            {{ count($questionvotes) }}
-                        @else
-                            0
-                        @endif
-                    </span>
-                    <div class="mt-2">
-                        <button id="downvote" class="btn btn-xs btn-outline-danger downvote-btn" value="downvote">Downvote</button>
-                    </div>
-                    <script>
+                    <div class="examples" id="questionvotes"></div>
+                        <div id="templates" class="upvotejs">
+                            <a class="upvote" title="This is good stuff. Vote it up! (Click again to undo)"></a>
+                            <span class="count" title="Total number of votes">{{ $question->count }}</span>
+                            <a class="downvote" title="This is not useful. Vote it down. (Click again to undo)"></a>
+                            <!-- <a class="star" title="Mark as favorite. (Click again to undo)"></a> -->
+                        </div>
+                    {{-- <script src="{{ asset('jquery-3.1.0.min.js') }}"></script> --}}
+                    <script src="{{ asset('dist/upvotejs/upvotejs.jquery.js') }}"></script>
+                    <script src="{{ asset('dist/upvotejs/upvotejs.vanilla.js') }}"></script>
+                    <link rel="stylesheet" href="{{ asset('dist/upvotejs/upvotejs.css') }}">
+                    <script type="text/javascript">
                         $(document).ready(function() {
-                            $('#upvote').on('click', function(e) {
-                                // $(this).toggleClass('b');
-                                $(this).addClass('upvote-btn on');
-                                $(this).toggleClass('upvote');
-                                // alert('upvote');
-                                var params = [];
-                                params['vote_for'] = 'question';
-                                params['url'] =
-                                    @if (count($questionvotes))
-                                        '{{ route('question.votes', $questionvotes[0]->id) }}'
-                                    @else
-                                        '{{ route('question.votes') }}'
-                                    @endif ;
-                                params['headers'] = {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                };
-                                params['type'] = 'GET';
-                                params['count'] = {{ $question->count }};
-                                params['values'] = {
-                                    'question_id': '{{ $question->id }}',
-                                    'user_id': '{{ auth()->user()->id }}'
-                                };
-                                console.log(params);
-                                    $.ajax({
-                                        url: params.url,
-                                        headers: params.headers,
-                                        type: params.type,
-                                        data: {
-                                            'question_id' : params.values.question_id,
-                                            'user_id' :params.values.user_id,
-                                            'count' : params.count,
-                                        },
-                                        success: function(data, status, xhr) {
-                                            //$("#examples").load(location.href + " #examples > *");
-                                            //$("#templates").load(location.href + " #templates > *");
-                                            // location.reload();
-                                            // console.log(data);
-                                        },
-                                    });
-                                // params['callback'] = callback;
-                                // console.log(params['callback']);
-                            // };
-                            // });
-                            $('#downvote').on('click', function() {
-                                alert('downvote');
-                            });
+                            $('#templates').upvote();
+                            var params = [];
+                            params['vote_for'] = 'question';
+                            params['url'] =
+                                @if (count($questionvotes))
+                                    '{{ route('question.votes', $questionvotes[0]->id) }}'
+                                @else
+                                    '{{ route('question.votes') }}'
+                                @endif ;
+                            params['headers'] = {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            };
+                            params['type'] = 'GET';
+                            params['count'] = {{ $question->count }};
+                            params['data'] = {
+                                'question_id': '{{ $question->id }}',
+                                'user_id': '{{ auth()->user()->id }}'
+                            };
+                            var callback = function(data) {
+                                data.question_id = params.data.question_id;
+                                data.user_id = params.data.user_id
+                                //data._method = 'PUT';
+                                $.ajax({
+                                    url: params.url,
+                                    headers: params.headers,
+                                    type: params.type,
+                                    data: data,
+                                    success: function(data, status, xhr) {
+                                        // $("#examples").load(location.href + " #examples > *");
+                                        // $("#templates").load(location.href + " #templates > *");
+                                        location.reload();
+                                    },
+                                });
+                            };
+                            params['callback'] = callback;
+                            @if (count($questionvotes))
+                                @if ($questionvotes[0]->vote == 'upvote')
+                                    params['upvoted'] = true;
+                                @elseif ($questionvotes[0]->vote == 'downvote')
+                                    params['downvoted'] = true;
+                                @endif
+                            @endif
+                            $questionobj = init('templates', 'upvotejs', '{{ $question->id }}', '#questionvotes', '',
+                                params);
+                                $questionobj.upvote();
+                            //console.log($questionobj);
+                            //console.log($questionobj.upvote());
                         });
-                    });
                     </script>
+                    {{-- <script type="text/javascript">
+                        $(document).ready(function() {
+                            $('#questionvotes').upvote();
+                            $('#questionvotes').upvote({
+                                count: {{ $question->count }},
+                                upvoted: true,
+                                downvoted: false,
+                            });
+                            $('#questionvotes').upvote('upvote');
+                            // downvote
+                            $('#questionvotes').upvote('downvote');
+                            // gets the current vote count
+                            $('#questionvotes').upvote('count');
+                            // gets the current states
+                            $('#questionvotes').upvote('upvoted');
+                            $('#questionvotes').upvote('downvoted');
+                        });
+                    </script> --}}
+                    {{-- <script>
+                        // $(document).ready(function() {
+                        //     $('#upvote').on('click', function(e) {
+                        //         // $(this).toggleClass('b');
+                        //         // $(this).addClass('upvote-btn on');
+                        //         // $(this).toggleClass('upvote');
+                        //         // alert('upvote');
+                        //         var params = [];
+                        //         params['vote_for'] = 'question';
+                        //         params['url'] =
+                        //             @if (count($questionvotes))
+                        //                 '{{ route('question.votes', $questionvotes[0]->id) }}'
+                        //             @else
+                        //                 '{{ route('question.votes') }}'
+                        //             @endif ;
+                        //         params['headers'] = {
+                        //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        //         };
+                        //         params['type'] = 'GET';
+                        //         params['count'] = {{ $question->count }};
+                        //         params['values'] = {
+                        //             'question_id': '{{ $question->id }}',
+                        //             'user_id': '{{ auth()->user()->id }}'
+                        //         };
+                        //         console.log(params);
+                        //             $.ajax({
+                        //                 url: '/question/votes',
+                        //                 headers: params.headers,
+                        //                 type: params.type,
+                        //                 data: {
+                        //                     'question_id' : params.values.question_id,
+                        //                     'user_id' :params.values.user_id,
+                        //                     'count' : params.count,
+                        //                 },
+                        //                 success: function(data, status, xhr) {
+                        //                     //$("#examples").load(location.href + " #examples > *");
+                        //                     //$("#templates").load(location.href + " #templates > *");
+                        //                     // location.reload();
+                        //                     // console.log(data);
+                        //                 },
+                        //             });
+                        //         // params['callback'] = callback;
+                        //         // console.log(params['callback']);
+                        //         })
+                        //     $('#downvote').on('click', function() {
+                        //         alert('downvote');
+                        //     });
+                        // });
+                    </script> --}}
                     {{-- <div class="examples" id="questionvotes"></div> --}}
                     {{-- <div class="content-center">
                     <div id="questionvotes" class="upvote">
@@ -260,29 +324,32 @@
         </form>
         {{-- dd($ans) --}}
         {{-- <script>
-        $(document).on('click','.toggle-class-data', function(){
+            $(document).on('click', '.toggle-class-data', function() {
                 var $this = $(this),
-                answerId = $this.attr('data-answer'),
-                questionId =  $this.attr('data-question'),
-                urlMain = "{{ route('accept-answer',':id') }}",
-                url = urlMain.replace(':id', answerId);
+                    answerId = $this.attr('data-answer'),
+                    questionId = $this.attr('data-question'),
+                    urlMain = "{{ route('accept-answer', ':id') }}",
+                    url = urlMain.replace(':id', answerId);
                 $.ajaxSetup({
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     }
                 });
-                $.ajax({ 
-                        type: "POST", 
-                        dataType: "json", 
-                        url:url,
-                        data: {'question_id' : questionId, 'answer_id': answerId}, 
-                        success: function(data){ 
-                            // console.log(data.success);
-                            $this.html(data.type);
-                        } 
-                }); 
-        });
-    </script> --}}
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: url,
+                    data: {
+                        'question_id': questionId,
+                        'answer_id': answerId
+                    },
+                    success: function(data) {
+                        // console.log(data.success);
+                        $this.html(data.type);
+                    }
+                });
+            });
+        </script> --}}
         {{-- <script type="text/javascript">
         $(document).ready(function(){
                     var params = [];
@@ -294,7 +361,7 @@
                     params['data'] = {'question_id' : '{{ $question->id }}', 'user_id' : '{{ auth()->user()->id }}'};
                     // console.log(params);
                 });
-    </script> --}}
+        </script> --}}
         <style>
             .hidden {
                 display: none;

@@ -78,7 +78,8 @@ class QuestionController extends Controller
         // $ans=Answer::get()->pluck('id');
         // dd($ans);
         $ans = null;
-        $questionvotes = QuestionVote::where("question_id", "=", $question['id'])->where("user_id", "=", auth()->user()->id)->get();
+        $questionvotes = QuestionVote::where("question_id", "=", $question->id)->where("user_id", "=", auth()->user()->id)->get();
+        // dd($questionvotes);
         $qv=QuestionVote::with('questions')->get();
         $answervotes = new AnswerVote();
         // dd($answervotes->replyvotes);
@@ -114,7 +115,7 @@ class QuestionController extends Controller
             abort('403');
         }
         $question->question_tag=implode('"',$input['question_tag']);
-        // dd($question);   
+        // dd($question);
         $question->update($input);
         // dd($question);
         // $question->sync($request->input('question_tag'));
@@ -154,18 +155,18 @@ class QuestionController extends Controller
         $answerdetails->save();
         return redirect()->route('question.show', $request['question_id']);
     }
-    public function questionCastVote(Request $request, $voteid = null)
+    public function questionCastVote(Request $request, $voteid)
     {
         $request->validate([
             'question_id' => 'required',
             'user_id' => 'required',
-            // 'action' => 'required',
-            'count' => 'required',
+            'action' => 'required',
+            'newState.count' => 'required',
         ]);
         $input['question_id'] = $request['question_id'];
         $input['user_id'] = $request['user_id'];
-        $input['vote_type'] = $request['action'];
-        $input['count'] = $request['count'];
+        $input['vote'] = $request['action'];
+        $input['count'] = $request['newState.count'];
         //dd($input);
         $questionvotedetails = QuestionVote::updateOrCreate(['id' => $voteid], $input);
         $questiondetails = Question::find($input['question_id']);
