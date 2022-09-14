@@ -12,7 +12,7 @@
     <div class="container pt-4">
         <h1>Review Question</h1>
         <ol class="breadcrumb mb-4">
-            <a class="btn btn-primary mr-2" href="{{ route('home') }}"> Back</a>
+            <a class="btn btn-primary mr-2" href="{{ route('home') }}">Back</a>
         </ol>
         <!-- <div class="container-fluid px-4"> -->
         <div class="s-page-title">
@@ -25,10 +25,9 @@
                 <div class="span text-center">
                     <div class="examples" id="questionvotes"></div>
                         <div id="templates" class="upvotejs">
-                            <a class="upvote" title="This is good stuff. Vote it up! (Click again to undo)"></a>
+                            <a id="upvote" class="upvote" title="This is good stuff. Vote it up! (Click again to undo)"></a>
                             <span class="count" title="Total number of votes">{{ $question->count }}</span>
-                            <a class="downvote" title="This is not useful. Vote it down. (Click again to undo)"></a>
-                            <!-- <a class="star" title="Mark as favorite. (Click again to undo)"></a> -->
+                            <a id="downvote" class="downvote" title="This is not useful. Vote it down. (Click again to undo)"></a>
                         </div>
                     {{-- <script src="{{ asset('jquery-3.1.0.min.js') }}"></script> --}}
                     <script src="{{ asset('dist/upvotejs/upvotejs.jquery.js') }}"></script>
@@ -38,6 +37,14 @@
                         $(document).ready(function() {
                             $('#templates').upvote();
                             var params = [];
+                            // $('#templates').upvote('downvote');
+                            // console.log($('#upvote').attr('class'));
+                            // if ($('#templates').attr('upvote upvote-on')) {
+                            //     params['vote'] = 'upvoted';
+                            // }
+                            // if ($('#templates').attr('downvote downvote-on')) {
+                            //     params['vote'] = "downvote"
+                            // }
                             params['vote_for'] = 'question';
                             params['url'] =
                                 @if (count($questionvotes))
@@ -50,59 +57,56 @@
                             };
                             params['type'] = 'GET';
                             params['count'] = {{ $question->count }};
-                            params['data'] = {
+                            params['ids'] = {
                                 'question_id': '{{ $question->id }}',
                                 'user_id': '{{ auth()->user()->id }}'
                             };
-                            var callback = function(data) {
-                                data.question_id = params.data.question_id;
-                                data.user_id = params.data.user_id
-                                //data._method = 'PUT';
+                            var data=[];
+                            data.question_id=params.ids.question_id;
+                                data.user_id=params.ids.user_id;
+                                // data.vote=params.vote;
+                                data.count=params.count;
+                            // console.log(data);
+                            var callback = function(data){
+                                data.question_id=params.ids.question_id;
+                                data.user_id=params.ids.user_id;
+                                data.vote=params.vote;
+                                data.count=params.count;
                                 $.ajax({
                                     url: params.url,
                                     headers: params.headers,
                                     type: params.type,
-                                    data: data,
-                                    success: function(data, status, xhr) {
+                                     data: params.callback,
+                                    success: function(data) {
                                         // $("#examples").load(location.href + " #examples > *");
                                         // $("#templates").load(location.href + " #templates > *");
-                                        location.reload();
+                                        // location.reload();
+                                        console.log(data);
                                     },
                                 });
-                            };
-                            params['callback'] = callback;
-                            @if (count($questionvotes))
-                                @if ($questionvotes[0]->vote == 'upvote')
-                                    params['upvoted'] = true;
-                                @elseif ($questionvotes[0]->vote == 'downvote')
-                                    params['downvoted'] = true;
-                                @endif
-                            @endif
-                            $questionobj = init('templates', 'upvotejs', '{{ $question->id }}', '#questionvotes', '',
-                                params);
-                                $questionobj.upvote();
-                            //console.log($questionobj);
-                            //console.log($questionobj.upvote());
+                            }
+                            // var callback = function(data) {
+                            //     data.question_id = params.question_id;
+                            //     data.user_id = params.user_id
+                            //     //data._method = 'PUT';
+                            //     $.ajax({
+                            //         url: params.url,
+                            //         headers: params.headers,
+                            //         type: params.type,
+                            //          data: data,
+                            //         success: function(data) {
+                            //             // $("#examples").load(location.href + " #examples > *");
+                            //             // $("#templates").load(location.href + " #templates > *");
+                            //             // location.reload();
+                            //             console.log(data);
+                            //         },
+                            //     });
+                            // };
+                            // params['callback'] = callback;
+                            // console.log(params);
+                            // $('#templates-2').upvote({id: 2, callback: params});
                         });
                     </script>
-                    {{-- <script type="text/javascript">
-                        $(document).ready(function() {
-                            $('#questionvotes').upvote();
-                            $('#questionvotes').upvote({
-                                count: {{ $question->count }},
-                                upvoted: true,
-                                downvoted: false,
-                            });
-                            $('#questionvotes').upvote('upvote');
-                            // downvote
-                            $('#questionvotes').upvote('downvote');
-                            // gets the current vote count
-                            $('#questionvotes').upvote('count');
-                            // gets the current states
-                            $('#questionvotes').upvote('upvoted');
-                            $('#questionvotes').upvote('downvoted');
-                        });
-                    </script> --}}
                     {{-- <script>
                         // $(document).ready(function() {
                         //     $('#upvote').on('click', function(e) {

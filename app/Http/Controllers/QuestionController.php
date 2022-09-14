@@ -135,39 +135,20 @@ class QuestionController extends Controller
             return redirect()->route('home')->with('success', 'questions deleted successfully');
         }
     }
-    public function answerCastVote(Request $request, $voteid = null)
-    {
-        $request->validate([
-            'question_id' => 'required',
-            'answer_id' => 'required',
-            'user_id' => 'required',
-            'action' => 'required',
-            'count' => 'required',
-        ]);
-        $input['answer_id'] = $request['answer_id'];
-        $input['user_id'] = $request['user_id'];
-        $input['vote_type'] = $request['action'];
-        $input['count'] = $request['count'];
-        //dd($input);
-        $answervotedetails = AnswerVote::updateOrCreate(['id' => $voteid], $input);
-        $answerdetails = Answer::find($input['answer_id']);
-        $answerdetails['count'] = $input['count'];
-        $answerdetails->save();
-        return redirect()->route('question.show', $request['question_id']);
-    }
     public function questionCastVote(Request $request, $voteid)
     {
         $request->validate([
-            'question_id' => 'required',
-            'user_id' => 'required',
-            'action' => 'required',
-            'newState.count' => 'required',
+            // 'question_id' => 'required',
+            // 'user_id' => 'required',
+            // 'action' => 'required',
+            // 'newState.count' => 'required',
         ]);
+        // dd($request);
         $input['question_id'] = $request['question_id'];
         $input['user_id'] = $request['user_id'];
         $input['vote'] = $request['action'];
-        $input['count'] = $request['newState.count'];
-        //dd($input);
+        $input['count'] = $request['count'];
+        // dd($input);
         $questionvotedetails = QuestionVote::updateOrCreate(['id' => $voteid], $input);
         $questiondetails = Question::find($input['question_id']);
         $questiondetails['count'] = $input['count'];
