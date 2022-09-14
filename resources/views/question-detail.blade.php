@@ -37,14 +37,6 @@
                         $(document).ready(function() {
                             $('#templates').upvote();
                             var params = [];
-                            // $('#templates').upvote('downvote');
-                            // console.log($('#upvote').attr('class'));
-                            // if ($('#templates').attr('upvote upvote-on')) {
-                            //     params['vote'] = 'upvoted';
-                            // }
-                            // if ($('#templates').attr('downvote downvote-on')) {
-                            //     params['vote'] = "downvote"
-                            // }
                             params['vote_for'] = 'question';
                             params['url'] =
                                 @if (count($questionvotes))
@@ -104,7 +96,7 @@
                             // };
                             // params['callback'] = callback;
                             // console.log(params);
-                            // $('#templates-2').upvote({id: 2, callback: params});
+                            // $('#templates-2').upvote({id: 2, callback: callback});
                         });
                     </script>
                     {{-- <script>
@@ -156,32 +148,6 @@
                         //     });
                         // });
                     </script> --}}
-                    {{-- <div class="examples" id="questionvotes"></div> --}}
-                    {{-- <div class="content-center">
-                    <div id="questionvotes" class="upvote">
-                        <a class="upvote" title="This is good stuff. Vote it up! (Click again to undo)">
-                        </a>
-                        <span class="count" title="Total number of votes">@if (isset($question->questionvotes)){{
-                            count($question->questionvotes) }}@else 0 @endif</span>
-                        <a id="downvote" class="downvote"
-                            title="This is not useful. Vote it down. (Click again to undo)">
-                        </a>
-                    </div>
-                </div> --}}
-                    {{-- <script type="text/javascript">
-                    $(document).ready(function(){
-                    $('#questionvotes').upvote({
-                        count: @if (isset($question->questionvotes)){{ count($question->questionvotes) }}@else 1 @endif ,
-                        upvoted: true,
-                        downvoted: false
-                    });
-                    $('#questionvotes').upvote('downvote');
-                    $('#questionvotes').upvote('upvote');
-                    $('#questionvotes').upvote('count');
-                    $('#questionvotes').upvote('upvoted');
-                    $('#questionvotes').upvote('downvoted');
-                });
-                </script> --}}
                 </div>
             </div>
             <div class="s-post-summary">

@@ -138,10 +138,10 @@ class QuestionController extends Controller
     public function questionCastVote(Request $request, $voteid)
     {
         $request->validate([
-            // 'question_id' => 'required',
-            // 'user_id' => 'required',
-            // 'action' => 'required',
-            // 'newState.count' => 'required',
+            'question_id' => 'required',
+            'user_id' => 'required',
+            'action' => 'required',
+            'newState.count' => 'required',
         ]);
         // dd($request);
         $input['question_id'] = $request['question_id'];
